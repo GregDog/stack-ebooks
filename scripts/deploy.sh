@@ -26,7 +26,8 @@ fi
 MOUNT_POINT="${SEEDHOST_MOUNT_POINT:-/mnt/seedhost-ebooks}"
 if [[ -f "${ROOT}/.env" ]]; then
   # shellcheck source=/dev/null
-  source "${ROOT}/.env"
+  source "${ROOT}/scripts/load-env.sh"
+  load_env_file "${ROOT}/.env"
   MOUNT_POINT="${SEEDHOST_MOUNT_POINT:-/mnt/seedhost-ebooks}"
 fi
 

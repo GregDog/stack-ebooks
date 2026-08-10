@@ -9,7 +9,8 @@ DOCKER="${DOCKER:-sg docker -c}"
 ADMIN_EMAIL="${SHELFMARK_ADMIN_EMAIL:-gregdogknell@gmail.com}"
 if [[ -f "$ENV_FILE" ]]; then
   # shellcheck source=/dev/null
-  source "$ENV_FILE"
+  source "${ROOT}/scripts/load-env.sh"
+  load_env_file "$ENV_FILE"
   ADMIN_EMAIL="${SHELFMARK_ADMIN_EMAIL:-$ADMIN_EMAIL}"
 fi
 

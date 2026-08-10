@@ -8,7 +8,8 @@ DOCKER="${DOCKER:-sg docker -c}"
 
 if [[ -f "$ENV_FILE" ]]; then
   # shellcheck source=/dev/null
-  source "$ENV_FILE"
+  source "${ROOT}/scripts/load-env.sh"
+  load_env_file "$ENV_FILE"
 fi
 
 MOUNT_POINT="${SEEDHOST_MOUNT_POINT:-/mnt/seedhost-ebooks}"

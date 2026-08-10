@@ -11,7 +11,8 @@ if [[ ! -f "$ENV_FILE" ]]; then
 fi
 
 # shellcheck source=/dev/null
-source "$ENV_FILE"
+source "/opt/stacks/ebooks/scripts/load-env.sh"
+load_env_file "$ENV_FILE"
 
 MOUNT_POINT="${SEEDHOST_MOUNT_POINT:-/mnt/seedhost-ebooks}"
 REMOTE_PATH="${SEEDHOST_SFTP_REMOTE_PATH:-downloads/ebooks}"

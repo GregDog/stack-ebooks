@@ -16,7 +16,8 @@ if [[ ! -f "$ENV_FILE" ]]; then
 fi
 
 # shellcheck source=/dev/null
-source "$ENV_FILE"
+source "${ROOT}/scripts/load-env.sh"
+load_env_file "$ENV_FILE"
 
 : "${SEEDHOST_SFTP_HOST:?SEEDHOST_SFTP_HOST required in .env}"
 : "${SEEDHOST_SFTP_USER:?SEEDHOST_SFTP_USER required in .env}"

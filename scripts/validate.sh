@@ -14,8 +14,12 @@ else
 fi
 
 if mountpoint -q /mnt/seedhost-ebooks 2>/dev/null; then
-  echo "==> Validating SeedHost mount"
-  bash scripts/validate-seedhost-mount.sh
+  if $DOCKER "docker inspect shelfmark" &>/dev/null 2>&1; then
+    echo "==> Validating SeedHost mount"
+    bash scripts/validate-seedhost-mount.sh
+  else
+    echo "==> SeedHost mount active; skipping container path checks until stack is deployed"
+  fi
 else
   echo "WARNING: /mnt/seedhost-ebooks not mounted (OK if first-time setup before install-seedhost-mount.sh)"
 fi
