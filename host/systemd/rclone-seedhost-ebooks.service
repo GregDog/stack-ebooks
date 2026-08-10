@@ -1,0 +1,19 @@
+[Unit]
+Description=rclone read-only mount: SeedHost ebook downloads
+Documentation=file:/opt/stacks/ebooks/README.md
+After=network-online.target
+Wants=network-online.target
+Before=docker.service
+
+[Service]
+Type=simple
+ExecStartPre=/bin/mkdir -p /mnt/seedhost-ebooks
+ExecStart=/opt/stacks/ebooks/scripts/rclone-mount.sh
+ExecStop=/bin/fusermount -u /mnt/seedhost-ebooks
+Restart=on-failure
+RestartSec=15
+User=greg
+Group=greg
+
+[Install]
+WantedBy=multi-user.target

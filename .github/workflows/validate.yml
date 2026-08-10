@@ -1,0 +1,28 @@
+name: Validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: [self-hosted, z2, linux]
+
+    env:
+      STACK_DIR: /opt/stacks/ebooks
+
+    steps:
+      - name: Validate compose and scripts
+        run: |
+          set -euo pipefail
+          cd "${STACK_DIR}"
+          git fetch origin main 2>/dev/null || true
+          git checkout -f "${GITHUB_SHA:-HEAD}" 2>/dev/null || true
+          shellcheck scripts/*.sh
+          if [[ -f .env ]]; then
+            sg docker -c 'docker compose config' >/dev/null
+          else
+            echo "No .env on runner — skipping docker compose config"
+          fi
+          bash scripts/validate.sh

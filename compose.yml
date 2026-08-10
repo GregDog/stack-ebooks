@@ -1,0 +1,148 @@
+services:
+  shelfmark:
+    image: ghcr.io/calibrain/shelfmark-lite:latest
+    container_name: shelfmark
+    restart: unless-stopped
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: Europe/London
+      FLASK_PORT: "8084"
+      SEARCH_MODE: universal
+      INGEST_DIR: /nas/eBookDownloads
+      AUTH_METHOD: oidc
+      DISABLE_LOCAL_AUTH: "true"
+      HIDE_LOCAL_AUTH: "true"
+      OIDC_AUTO_REDIRECT: "true"
+      OIDC_DISCOVERY_URL: https://id.cvss.io/.well-known/openid-configuration
+      OIDC_CLIENT_ID: ${SHELFMARK_OIDC_CLIENT_ID:?SHELFMARK_OIDC_CLIENT_ID required}
+      OIDC_CLIENT_SECRET: ${SHELFMARK_OIDC_CLIENT_SECRET:?SHELFMARK_OIDC_CLIENT_SECRET required}
+      OIDC_AUTO_PROVISION: "true"
+      OIDC_USE_ADMIN_GROUP: "false"
+      PROWLARR_ENABLED: "true"
+      PROWLARR_URL: http://192.168.2.4:9696
+      PROWLARR_API_KEY: ${PROWLARR_API_KEY:?PROWLARR_API_KEY required}
+      PROWLARR_TORRENT_CLIENT: qbittorrent
+      QBITTORRENT_URL: ${QBITTORRENT_URL:?QBITTORRENT_URL required}
+      QBITTORRENT_USERNAME: ${QBITTORRENT_USERNAME:?QBITTORRENT_USERNAME required}
+      QBITTORRENT_PASSWORD: ${QBITTORRENT_PASSWORD:?QBITTORRENT_PASSWORD required}
+      QBITTORRENT_CATEGORY: ebooks
+      QBITTORRENT_DOWNLOAD_DIR: /home16/harenix/downloads/ebooks
+      PROWLARR_TORRENT_ACTION: keep
+      HARDLINK_TORRENTS: "false"
+      DOWNLOAD_CLIENT_COMPLETED_PATH_TIMEOUT: "120"
+    volumes:
+      - /opt/ebooks/shelfmark/config:/config
+      - synology-media:/nas
+      # Read-only SeedHost qBittorrent downloads (same path qBittorrent uses on SeedHost)
+      - /mnt/seedhost-ebooks:/home16/harenix/downloads/ebooks:ro
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      lab:
+        ipv4_address: 192.168.2.6
+      stackproxy: {}
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8084/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  bookorbit:
+    image: ${BOOKORBIT_IMAGE:-ghcr.io/bookorbit/bookorbit:latest}
+    container_name: bookorbit
+    restart: unless-stopped
+    init: true
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      POSTGRES_HOST: bookorbit-db
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: ${BOOKORBIT_POSTGRES_USER:-bookorbit}
+      POSTGRES_PASSWORD: ${BOOKORBIT_POSTGRES_PASSWORD:?BOOKORBIT_POSTGRES_PASSWORD required}
+      POSTGRES_DB: ${BOOKORBIT_POSTGRES_DB:-bookorbit}
+      JWT_SECRET: ${BOOKORBIT_JWT_SECRET:?BOOKORBIT_JWT_SECRET required}
+      SETUP_BOOTSTRAP_TOKEN: ${BOOKORBIT_SETUP_BOOTSTRAP_TOKEN:?BOOKORBIT_SETUP_BOOTSTRAP_TOKEN required}
+      APP_URL: https://ebooks.cvss.io
+      CLIENT_URL: https://ebooks.cvss.io
+      PUID: "1000"
+      PGID: "1000"
+      LIBRARY_BROWSE_ROOT: /nas
+      BOOK_DOCK_PATH: /nas/eBookDownloads
+      NODE_MAX_OLD_SPACE_SIZE: "2048"
+      OIDC_ALLOW_LOCAL_ISSUERS: "true"
+    volumes:
+      - synology-media:/nas
+      - /opt/ebooks/bookorbit/data/app:/data
+      - /etc/localtime:/etc/localtime:ro
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 30s
+    depends_on:
+      bookorbit-db:
+        condition: service_healthy
+    networks:
+      lab:
+        ipv4_address: 192.168.2.7
+      stackproxy: {}
+      internal: {}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "const p=process.env.PORT||3000;fetch('http://127.0.0.1:'+p+'/api/v1/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  bookorbit-db:
+    image: pgvector/pgvector:pg18
+    container_name: bookorbit-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${BOOKORBIT_POSTGRES_USER:-bookorbit}
+      POSTGRES_PASSWORD: ${BOOKORBIT_POSTGRES_PASSWORD:?BOOKORBIT_POSTGRES_PASSWORD required}
+      POSTGRES_DB: ${BOOKORBIT_POSTGRES_DB:-bookorbit}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - /opt/ebooks/bookorbit/data/postgres:/var/lib/postgresql/data
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      internal: {}
+    healthcheck:
+      test:
+        ["CMD-SHELL", 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+networks:
+  lab:
+    external: true
+    name: lab
+  stackproxy:
+    external: true
+    name: stackproxy
+  internal:
+    driver: bridge
+
+volumes:
+  synology-media:
+    external: true
+    name: synology-media

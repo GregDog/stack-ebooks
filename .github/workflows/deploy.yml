@@ -1,0 +1,24 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, z2, linux]
+    environment: production
+
+    env:
+      STACK_DIR: /opt/stacks/ebooks
+
+    steps:
+      - name: Sync production stack and deploy
+        run: |
+          set -euo pipefail
+          cd "${STACK_DIR}"
+          git fetch origin main
+          git reset --hard origin/main
+          export PATH="${HOME}/bin:${PATH}"
+          bash scripts/deploy.sh
