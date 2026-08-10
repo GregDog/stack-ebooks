@@ -21,7 +21,8 @@ for i in $(seq 1 30); do
   fi
 
   updated=$($DOCKER "docker exec bookorbit-db psql -U bookorbit -d bookorbit -tAc \"
-UPDATE users SET is_superuser = true, active = true WHERE lower(email) = lower('${ADMIN_EMAIL}');
+UPDATE users SET is_superuser = true, active = true, username = lower(username)
+WHERE lower(email) = lower('${ADMIN_EMAIL}');
 INSERT INTO user_permissions (user_id, permission_name)
 SELECT id, p FROM users, (VALUES ('manage_app_settings'), ('manage_users')) AS perms(p)
 WHERE lower(users.email) = lower('${ADMIN_EMAIL}')

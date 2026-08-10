@@ -22,9 +22,9 @@ for i in $(seq 1 30); do
 
   count=$($DOCKER "docker exec shelfmark python3 -c \"
 import sqlite3
-con = sqlite3.connect('/config/app.db')
+con = sqlite3.connect('/config/users.db')
 cur = con.cursor()
-cur.execute('UPDATE users SET is_admin = 1 WHERE lower(email) = lower(?)', ('${ADMIN_EMAIL}',))
+cur.execute('UPDATE users SET role = \\\"admin\\\" WHERE lower(email) = lower(?)', ('${ADMIN_EMAIL}',))
 con.commit()
 print(cur.rowcount)
 \"" 2>/dev/null || echo "err")
