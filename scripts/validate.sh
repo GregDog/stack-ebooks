@@ -7,8 +7,11 @@ cd "$ROOT"
 DOCKER="${DOCKER:-sg docker -c}"
 
 echo "==> Validating Compose"
-$DOCKER "docker compose --env-file .env.example config" >/dev/null 2>&1 || \
+if [[ -f "${ROOT}/.env" ]]; then
   $DOCKER "docker compose config" >/dev/null
+else
+  echo "WARNING: no .env — skipping docker compose config (copy .env.example first)"
+fi
 
 if mountpoint -q /mnt/seedhost-ebooks 2>/dev/null; then
   echo "==> Validating SeedHost mount"
