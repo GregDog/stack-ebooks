@@ -172,6 +172,7 @@ Production path: `/opt/stacks/ebooks`.
 | Shelfmark ENOENT on download | rclone dir cache — restart mount + `docker compose up -d --force-recreate shelfmark` |
 | Transport endpoint not connected | Recreate shelfmark after rclone restart |
 | Missing NAS folders | Create `eBooks` and `eBookDownloads` on Synology share |
-| Not admin after SSO | Log in once, re-run deploy (runs `ensure-shelfmark-admin.sh`) |
+| Not admin after SSO (Shelfmark) | Log in once, re-run deploy (runs `ensure-shelfmark-admin.sh`) |
+| Not admin after SSO (BookOrbit) | Enable **Allow local account linking** on OIDC provider; deploy runs `ensure-bookorbit-admin.sh`. Log out and sign in via Pocket ID again. Or log in locally as your setup user. |
 
 Mount logs: `/opt/ebooks/shelfmark/rclone/rclone-mount.log`

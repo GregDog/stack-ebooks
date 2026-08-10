@@ -46,6 +46,10 @@ if $DOCKER "docker compose ps --status running --services" 2>/dev/null | grep -q
   bash scripts/ensure-shelfmark-admin.sh
 fi
 
+if $DOCKER "docker compose ps --status running --services" 2>/dev/null | grep -qx bookorbit; then
+  bash scripts/ensure-bookorbit-admin.sh
+fi
+
 echo "==> Container status"
 $DOCKER "docker compose ps"
 
