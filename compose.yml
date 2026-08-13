@@ -15,6 +15,8 @@ services:
       HIDE_LOCAL_AUTH: "true"
       OIDC_AUTO_REDIRECT: "true"
       OIDC_DISCOVERY_URL: https://id.cvss.io/.well-known/openid-configuration
+      SSL_CERT_FILE: /caddy-ca/caddy/pki/authorities/local/root.crt
+      REQUESTS_CA_BUNDLE: /caddy-ca/caddy/pki/authorities/local/root.crt
       OIDC_CLIENT_ID: ${SHELFMARK_OIDC_CLIENT_ID:?SHELFMARK_OIDC_CLIENT_ID required}
       OIDC_CLIENT_SECRET: ${SHELFMARK_OIDC_CLIENT_SECRET:?SHELFMARK_OIDC_CLIENT_SECRET required}
       OIDC_AUTO_PROVISION: "true"
@@ -34,6 +36,7 @@ services:
     volumes:
       - /opt/ebooks/shelfmark/config:/config
       - synology-media:/nas
+      - stackproxy_caddy_data:/caddy-ca:ro
       # Read-only SeedHost qBittorrent downloads (same path qBittorrent uses on SeedHost)
       - /mnt/seedhost-ebooks:/home16/harenix/downloads/ebooks:ro
       - /etc/localtime:/etc/localtime:ro
@@ -71,9 +74,11 @@ services:
       BOOK_DOCK_PATH: /nas/eBookDownloads
       NODE_MAX_OLD_SPACE_SIZE: "2048"
       OIDC_ALLOW_LOCAL_ISSUERS: "true"
+      NODE_EXTRA_CA_CERTS: /caddy-ca/caddy/pki/authorities/local/root.crt
     volumes:
       - synology-media:/nas
       - /opt/ebooks/bookorbit/data/app:/data
+      - stackproxy_caddy_data:/caddy-ca:ro
       - /etc/localtime:/etc/localtime:ro
     read_only: true
     tmpfs:
@@ -146,3 +151,6 @@ volumes:
   synology-media:
     external: true
     name: synology-media
+  stackproxy_caddy_data:
+    external: true
+    name: stackproxy_caddy_data
