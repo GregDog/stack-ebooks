@@ -11,7 +11,7 @@ Public access via **stackproxy**:
 | URL | Service | Auth |
 |-----|---------|------|
 | https://ebookrequests.cvss.io | Shelfmark | Pocket ID OIDC (native) |
-| https://ebooks.cvss.io | BookOrbit | Pocket ID OIDC (admin UI) |
+| https://library.cvss.io | BookOrbit | Pocket ID OIDC (admin UI) |
 
 ## Architecture
 
@@ -35,7 +35,7 @@ Prowlarr (audiobooks stack, lab 192.168.2.4) → MAM / indexers for Shelfmark
 | Service | Network | Public |
 |---------|---------|--------|
 | shelfmark | `lab` + `stackproxy` | `ebookrequests.cvss.io` |
-| bookorbit | `lab` + `stackproxy` | `ebooks.cvss.io` |
+| bookorbit | `lab` + `stackproxy` | `library.cvss.io` |
 | bookorbit-db | `internal` | — |
 
 ## Paths
@@ -92,7 +92,7 @@ cd /opt/stacks/stackproxy && bash scripts/deploy.sh
 | App | Redirect URI |
 |-----|--------------|
 | Shelfmark | `https://ebookrequests.cvss.io/api/auth/oidc/callback` |
-| BookOrbit | `https://ebooks.cvss.io/oauth2-callback` |
+| BookOrbit | `https://library.cvss.io/oauth2-callback` |
 
 5. **Deploy ebooks stack**
 
@@ -103,7 +103,7 @@ bash scripts/deploy.sh
 
 6. **BookOrbit initial setup**
 
-- Open https://ebooks.cvss.io/auth/setup
+- Open https://library.cvss.io/auth/setup
 - Header: `x-setup-token: <BOOKORBIT_SETUP_BOOTSTRAP_TOKEN from .env>`
 - Create admin account, then add library rooted at **`/nas/eBooks`**
 - Settings → OIDC / SSO → configure Pocket ID (`https://id.cvss.io`)

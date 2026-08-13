@@ -63,8 +63,8 @@ services:
       POSTGRES_DB: ${BOOKORBIT_POSTGRES_DB:-bookorbit}
       JWT_SECRET: ${BOOKORBIT_JWT_SECRET:?BOOKORBIT_JWT_SECRET required}
       SETUP_BOOTSTRAP_TOKEN: ${BOOKORBIT_SETUP_BOOTSTRAP_TOKEN:?BOOKORBIT_SETUP_BOOTSTRAP_TOKEN required}
-      APP_URL: https://ebooks.cvss.io
-      CLIENT_URL: https://ebooks.cvss.io
+      APP_URL: https://library.cvss.io
+      CLIENT_URL: https://library.cvss.io
       PUID: "1000"
       PGID: "1000"
       LIBRARY_BROWSE_ROOT: /nas
