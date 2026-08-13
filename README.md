@@ -115,6 +115,19 @@ bash scripts/deploy.sh
 - Deploy promotes `SHELFMARK_ADMIN_EMAIL` to admin after first login
 - Settings → confirm Prowlarr + qBittorrent (env defaults apply; verify category `ebooks`)
 
+## Family access (multi-user)
+
+Ingress group policy lives in [stackproxy](../stackproxy/README.md#access-groups-pocket-id--tinyauth). On deploy, this stack configures:
+
+| App | Script | Behaviour |
+|-----|--------|-----------|
+| Shelfmark | `configure-shelfmark-requests.sh` | Request workflow enabled (`request_book` — you pick release on fulfil) |
+| BookOrbit | `configure-bookorbit-family-oidc.sh` | Pocket ID group **media-users** → `library_download`; default library access; no admin default perms |
+
+Set `SHELFMARK_ADMIN_EMAIL` and `BOOKORBIT_ADMIN_EMAIL` in `.env`. Optional: `BOOKORBIT_MEDIA_OIDC_GROUP=media-users`, `BOOKORBIT_DEFAULT_LIBRARY_ID=1`.
+
+Family must be in Pocket ID group **media-users** only (not `stackproxy-admins`).
+
 ## Send-to-Kindle (BookOrbit)
 
 Configured in **BookOrbit admin → Settings → Email** (not in Git):

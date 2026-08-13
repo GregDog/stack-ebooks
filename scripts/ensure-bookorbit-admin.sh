@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Ensure Pocket ID SSO user has BookOrbit superuser + admin permissions.
+# Ensure Pocket ID SSO user is BookOrbit superuser. Family permissions come from OIDC group mappings.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -27,23 +27,16 @@ INSERT INTO user_permissions (user_id, permission_name)
 SELECT id, p FROM users, (VALUES ('manage_app_settings'), ('manage_users')) AS perms(p)
 WHERE lower(users.email) = lower('${ADMIN_EMAIL}')
 ON CONFLICT DO NOTHING;
-UPDATE oidc_providers
-SET auto_provision = jsonb_set(
-  jsonb_set(auto_provision, '{allowLocalLinking}', 'true'),
-  '{defaultPermissionNames}',
-  '[\\\"manage_app_settings\\\", \\\"manage_users\\\", \\\"library_download\\\", \\\"email_send\\\"]'::jsonb
-)
-WHERE slug = 'pocketid';
 SELECT count(*) FROM users WHERE lower(email) = lower('${ADMIN_EMAIL}') AND is_superuser = true;
 \"" 2>/dev/null | tail -1 || true)
 
   if [[ "$updated" == "1" ]]; then
-    echo "BookOrbit: ensured superuser for ${ADMIN_EMAIL} (OIDC local linking enabled)"
+    echo "BookOrbit: ensured superuser for ${ADMIN_EMAIL}"
     exit 0
   fi
 
   if [[ "$updated" == "0" ]]; then
-    echo "BookOrbit: user ${ADMIN_EMAIL} not found yet (complete setup or log in once via Pocket ID)"
+    echo "BookOrbit: user ${ADMIN_EMAIL} not found yet (log in once via Pocket ID)"
     exit 0
   fi
 

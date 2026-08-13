@@ -44,10 +44,12 @@ $DOCKER "docker compose up -d"
 
 if $DOCKER "docker compose ps --status running --services" 2>/dev/null | grep -qx shelfmark; then
   bash scripts/ensure-shelfmark-admin.sh
+  bash scripts/configure-shelfmark-requests.sh
 fi
 
 if $DOCKER "docker compose ps --status running --services" 2>/dev/null | grep -qx bookorbit; then
   bash scripts/ensure-bookorbit-admin.sh
+  bash scripts/configure-bookorbit-family-oidc.sh
 fi
 
 echo "==> Container status"
