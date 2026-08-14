@@ -38,6 +38,8 @@ if ! mountpoint -q "${MOUNT_POINT}" 2>/dev/null; then
   exit 1
 fi
 
+bash scripts/ensure-shelfmark-ca-bundle.sh
+
 echo "==> Deploying ebooks stack"
 $DOCKER "docker compose pull"
 $DOCKER "docker compose up -d"

@@ -15,8 +15,8 @@ services:
       HIDE_LOCAL_AUTH: "true"
       OIDC_AUTO_REDIRECT: "true"
       OIDC_DISCOVERY_URL: https://id.cvss.io/.well-known/openid-configuration
-      SSL_CERT_FILE: /caddy-ca/caddy/pki/authorities/local/root.crt
-      REQUESTS_CA_BUNDLE: /caddy-ca/caddy/pki/authorities/local/root.crt
+      SSL_CERT_FILE: /config/combined-ca.crt
+      REQUESTS_CA_BUNDLE: /config/combined-ca.crt
       OIDC_CLIENT_ID: ${SHELFMARK_OIDC_CLIENT_ID:?SHELFMARK_OIDC_CLIENT_ID required}
       OIDC_CLIENT_SECRET: ${SHELFMARK_OIDC_CLIENT_SECRET:?SHELFMARK_OIDC_CLIENT_SECRET required}
       OIDC_AUTO_PROVISION: "true"
